@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!--标题栏-->
+    <include layout="@layout/titlebar"/>
+    <!--FramLayout-->
+    <FrameLayout
+        android:id="@+id/fl_main_conten"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <!--RadioGroup-->
+    <RadioGroup
+        android:id="@+id/rg_buttom"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#11000000"
+        android:orientation="horizontal">
+        <!--因为以下四个控件有些样式时一样的所以把公共部分写到style.xml中 用style引用公共部分样式-->
+        <!--视频-->
+        <RadioButton
+            android:text="LocalVideo"
+            android:drawableTop="@drawable/rb_video_select"
+            android:id="@+id/rb_video"
+            style="@style/radioGroup_style"/>
+        <!--音频-->
+        <RadioButton
+            android:text="LocalAudio"
+            android:drawableTop="@drawable/rb_audio_select"
+            android:id="@+id/rb_audio"
+            style="@style/radioGroup_style"/>
+        <!--网络视频-->
+        <RadioButton
+            android:text="NetVideo"
+            android:drawableTop="@drawable/rb_load_select"
+            android:id="@+id/rb_load"
+            style="@style/radioGroup_style"/>
+        <!--网络音频-->
+        <RadioButton
+            android:text="NetAudio"
+            android:drawableTop="@drawable/rb_setup_select"
+            android:id="@+id/rb_setUp"
+            style="@style/radioGroup_style"/>
+    </RadioGroup>
+
+</LinearLayout>
