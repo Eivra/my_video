@@ -31,6 +31,9 @@ private  Handler handler=new Handler();
 
     /**
      * 跳转到主页面，并且把当前页面关闭
+     * 防止启动多次方法：
+     *   1.在mainacyivity设置为单例
+     *   2.以下方法
      */
     private void startMainActivity(){
         Intent intent=new Intent(this,MainActivity.class);
@@ -50,6 +53,7 @@ private  Handler handler=new Handler();
 
     @Override
     protected void onDestroy() {
+        //消息和回调移除
         handler.removeCallbacksAndMessages(null);
         super.onDestroy();
     }

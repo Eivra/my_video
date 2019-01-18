@@ -58,7 +58,6 @@ public class TitleBar extends LinearLayout implements View.OnClickListener{
         rl_game.setOnClickListener(this);
         iv_record.setOnClickListener(this);
     }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()){
