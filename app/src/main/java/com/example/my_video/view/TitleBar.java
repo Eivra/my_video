@@ -8,19 +8,39 @@ import android.widget.Toast;
 
 import com.example.my_video.R;
 
+/**
+ * 自定义控件
+ */
 public class TitleBar extends LinearLayout implements View.OnClickListener{
     private Context context;
+    //实例化孩子
     private View search;
     private View rl_game;
     private View iv_record;
+
+    /**
+     * 代码使用
+     * @param context
+     */
     public TitleBar(Context context) {
         this(context,null);
     }
 
+    /**
+     * 布局文件
+     * @param context
+     * @param attrs
+     */
     public TitleBar(Context context, AttributeSet attrs) {
         this(context, attrs,0);
     }
 
+    /**
+     * 设置样式
+     * @param context
+     * @param attrs
+     * @param defStyleAttr
+     */
     public TitleBar(Context context,AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context=context;
