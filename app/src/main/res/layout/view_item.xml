@@ -44,11 +44,4 @@
         android:text="Video Size"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-    <View
-        android:layout_marginLeft="7dp"
-        android:layout_marginRight="7dp"
-        android:background="#5548B5D3"
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"/>
 </RelativeLayout>
