@@ -5,6 +5,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.widget.MediaController;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -37,12 +38,15 @@ public class VideoPlayerWindownActivity extends Activity {
         //获取播放地址
         uri = getIntent().getData();
         video_player_windown.setVideoURI(uri);
-        if (video_player_windown != null){
+        if (uri != null){
             video_player_windown.setVideoURI(uri);
         }
         video_player_windown.setOnPreparedListener(new MyOnPreparedListener());
         video_player_windown.setOnErrorListener(new MyOnErrorListener());
         video_player_windown.setOnCompletionListener(new MyOnCompletionListener());
+
+        //设置暂停.播放.控制条
+        video_player_windown.setMediaController(new MediaController(this));
     }
 
     public class MyOnPreparedListener implements MediaPlayer.OnPreparedListener {
