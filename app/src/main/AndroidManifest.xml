@@ -16,8 +16,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MainActivity" android:launchMode="singleTask">
-        </activity>
+
+        <activity android:name=".activity.MainActivity" android:launchMode="singleTask"/>
+
+        <activity android:name=".activity.VideoPlayerWindownActivity"/>
+
     </application>
 
 </manifest>

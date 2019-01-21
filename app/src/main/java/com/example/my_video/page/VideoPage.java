@@ -1,9 +1,12 @@
 package com.example.my_video.page;
 
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -11,19 +14,25 @@ import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.example.my_video.R;
+import com.example.my_video.activity.VideoPlayerWindownActivity;
 import com.example.my_video.adapter.VideoAdapter;
 import com.example.my_video.basePage.BasePage;
 import com.example.my_video.dto.VideoItem;
 import com.example.my_video.utils.LogUtils;
 import com.example.my_video.utils.TimeUtils;
 
+import java.io.File;
+import java.time.Instant;
 import java.util.ArrayList;
 
 
@@ -35,6 +44,7 @@ public class VideoPage extends BasePage {
     private ArrayList<VideoItem> videoItemArrayList;
     private TimeUtils timeUtils;
     private VideoAdapter videoAdapter;
+
     public VideoPage(Context context) {
         super(context);
         timeUtils = new TimeUtils();
@@ -46,8 +56,33 @@ public class VideoPage extends BasePage {
         listView = view.findViewById(R.id.listview);
         nonView = view.findViewById(R.id.nonView);
         pb_video = view.findViewById(R.id.pb_video);
+        listView.setOnItemClickListener(new OnContextClickListener());
         return view;
     }
+
+    class OnContextClickListener implements AdapterView.OnItemClickListener{
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+           VideoItem videoItem = videoItemArrayList.get(position);
+           //打印信息
+            Toast.makeText(context, videoItem.toString(),Toast.LENGTH_SHORT).show();
+            //调用播放器播放手机文件的视频
+//            Intent intent = new Intent(Intent.ACTION_VIEW);
+//            String path = videoItem.getData();//该路径可以自定义
+//            File file = new File(path);
+//            Uri uri = Uri.fromFile(file);
+//            intent.setDataAndType(uri, "video/*");
+//            context.startActivity(intent);
+         //自定义播放器
+            Intent intent = new Intent(context,VideoPlayerWindownActivity.class);
+            String path = videoItem.getData();//该路径可以自定义
+            File file = new File(path);
+            Uri uri = Uri.fromFile(file);
+            intent.setDataAndType(uri, "video/*");
+            context.startActivity(intent);
+        }
+    }
+
     @Override
     public void initDate(){
         LogUtils.e("本地视频页面初始化数据。。。。");
