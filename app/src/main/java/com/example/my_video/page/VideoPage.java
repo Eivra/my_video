@@ -65,7 +65,7 @@ public class VideoPage extends BasePage {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
            VideoItem videoItem = videoItemArrayList.get(position);
            //打印信息
-            Toast.makeText(context, videoItem.toString(),Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, videoItem.toString(),Toast.LENGTH_SHORT).show();
             //调用播放器播放手机文件的视频
 //            Intent intent = new Intent(Intent.ACTION_VIEW);
 //            String path = videoItem.getData();//该路径可以自定义
