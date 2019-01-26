@@ -131,22 +131,49 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         }
     }
 
+    //设置监听
+    private void setListener(){
+        video_player_windown.setOnPreparedListener(new MyOnPreparedListener());
+        video_player_windown.setOnErrorListener(new MyOnErrorListener());
+        video_player_windown.setOnCompletionListener(new MyOnCompletionListener());
+
+        //设置seekBar监听
+        sbTime.setOnSeekBarChangeListener(new videoSeekBarChangeListener());
+    }
+
+    class videoSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            if(fromUser){
+                video_player_windown.seekTo(progress);
+            }
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         timeUtils = new TimeUtils();
         findViews();
-
-
+         setListener();
         //获取播放地址
         uri = getIntent().getData();
         video_player_windown.setVideoURI(uri);
         if (uri != null){
             video_player_windown.setVideoURI(uri);
         }
-        video_player_windown.setOnPreparedListener(new MyOnPreparedListener());
-        video_player_windown.setOnErrorListener(new MyOnErrorListener());
-        video_player_windown.setOnCompletionListener(new MyOnCompletionListener());
+
 
         //设置暂停.播放.控制条
         //video_player_windown.setMediaController(new MediaController(this));
