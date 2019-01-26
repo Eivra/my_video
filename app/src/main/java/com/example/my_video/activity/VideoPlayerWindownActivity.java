@@ -46,7 +46,7 @@ public class VideoPlayerWindownActivity extends Activity {
         video_player_windown.setOnCompletionListener(new MyOnCompletionListener());
 
         //设置暂停.播放.控制条
-        video_player_windown.setMediaController(new MediaController(this));
+        //video_player_windown.setMediaController(new MediaController(this));
     }
 
     public class MyOnPreparedListener implements MediaPlayer.OnPreparedListener {

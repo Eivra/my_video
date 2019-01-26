@@ -17,9 +17,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activity.MainActivity" android:launchMode="singleTask"/>
+        <activity android:name=".activity.MainActivity" android:launchMode="singleTask"
+            android:configChanges="keyboardHidden|screenSize|orientation"/>
 
-        <activity android:name=".activity.VideoPlayerWindownActivity"/>
+        <activity android:name=".activity.VideoPlayerWindownActivity"
+            android:configChanges="keyboardHidden|screenSize|orientation"/>
 
     </application>
 
