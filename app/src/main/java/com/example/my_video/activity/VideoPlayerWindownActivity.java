@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -49,6 +51,7 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
     private ArrayList<VideoItem> videoItemArrayList;//视频列表
     int position;//播放列表中的位置
     //private MyReceiver myReceiver;//监听电量广播
+    private GestureDetector detector;//手势识别器
 
     private static final int PROGRESS = 1;
     private LinearLayout top;
@@ -124,16 +127,7 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
             playLast();
             // Handle clicks for butLast
         } else if ( v == butStop ) {
-            //播放->暂停
-            if (video_player_windown.isPlaying()){
-                video_player_windown.pause();
-                butStop.setBackgroundResource(R.drawable.stop_press);
-            }
-            //暂停->播放
-            else {
-                video_player_windown.start();
-                butStop.setBackgroundResource(R.drawable.stop);
-            }
+            playAndstop();
             // Handle clicks for butStop
         } else if ( v == butNext ) {
             // Handle clicks for butNext
@@ -141,6 +135,19 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         } else if ( v == butScreen ) {
             // Handle clicks for butScreen
 
+        }
+    }
+
+    private void playAndstop(){
+        //播放->暂停
+        if (video_player_windown.isPlaying()){
+            video_player_windown.pause();
+            butStop.setBackgroundResource(R.drawable.stop_press);
+        }
+        //暂停->播放
+        else {
+            video_player_windown.start();
+            butStop.setBackgroundResource(R.drawable.stop);
         }
     }
 
@@ -260,6 +267,32 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
        setData();;
         //设置暂停.播放.控制条
         //video_player_windown.setMediaController(new MediaController(this));
+
+        detector = new GestureDetector(this,new GestureDetector.SimpleOnGestureListener(){
+            @Override
+            public void onLongPress(MotionEvent e) {
+                super.onLongPress(e);
+                Toast.makeText(VideoPlayerWindownActivity.this,"onLongPress",Toast.LENGTH_SHORT).show();
+            }
+
+            /**
+             * 单击暂停或者播放
+             * @param e
+             * @return
+             */
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                playAndstop();
+                Toast.makeText(VideoPlayerWindownActivity.this,"onSingleTapConfirmed",Toast.LENGTH_SHORT).show();
+                return super.onSingleTapConfirmed(e);
+            }
+
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                Toast.makeText(VideoPlayerWindownActivity.this,"onDoubleTap",Toast.LENGTH_SHORT).show();
+                return super.onDoubleTap(e);
+            }
+        });
     }
 
     private void setData(){
@@ -412,5 +445,11 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
 //        }
         LogUtils.e("onDestroy....");
         super.onDestroy();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        detector.onTouchEvent(event);
+        return super.onTouchEvent(event);
     }
 }
