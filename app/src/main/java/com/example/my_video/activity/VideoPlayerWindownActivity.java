@@ -143,11 +143,13 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         if (video_player_windown.isPlaying()){
             video_player_windown.pause();
             butStop.setBackgroundResource(R.drawable.stop_press);
+            Toast.makeText(VideoPlayerWindownActivity.this,"暂停",Toast.LENGTH_SHORT).show();
         }
         //暂停->播放
         else {
             video_player_windown.start();
             butStop.setBackgroundResource(R.drawable.stop);
+            Toast.makeText(VideoPlayerWindownActivity.this,"播放",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -283,7 +285,6 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
                 playAndstop();
-                Toast.makeText(VideoPlayerWindownActivity.this,"onSingleTapConfirmed",Toast.LENGTH_SHORT).show();
                 return super.onSingleTapConfirmed(e);
             }
 
