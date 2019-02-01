@@ -1,6 +1,10 @@
 package com.example.my_video.activity;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,10 +20,12 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.example.my_video.R;
+import com.example.my_video.dto.VideoItem;
+import com.example.my_video.utils.LogUtils;
 import com.example.my_video.utils.TimeUtils;
 
-import static com.example.my_video.R.id.sb_voice;
-import static com.example.my_video.R.id.video_player_windown;
+import java.util.ArrayList;
+
 
 /**
  * 自定义播放器
@@ -40,6 +46,9 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
     private VideoView video_player_windown;
     private Uri uri;
     private TimeUtils timeUtils;
+    private ArrayList<VideoItem> videoItemArrayList;//视频列表
+    int position;//播放列表中的位置
+    //private MyReceiver myReceiver;//监听电量广播
 
     private static final int PROGRESS = 1;
     private LinearLayout top;
@@ -70,7 +79,7 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         setContentView(R.layout.video_player_windown);
         top = (LinearLayout)findViewById( R.id.top );
         tvName = (TextView)findViewById( R.id.tv_name );
-        ivBeteery = (ImageView)findViewById( R.id.iv_beteery );
+//        ivBeteery = (ImageView)findViewById( R.id.iv_beteery );
         time = (TextView)findViewById( R.id.time );
         voiceBottom = (LinearLayout)findViewById( R.id.voice_bottom );
         butVoice = (Button)findViewById( R.id.but_voice );
@@ -110,6 +119,7 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
             // Handle clicks for selectVideo
         } else if ( v == butBack ) {
             // Handle clicks for butBack
+            finish();
         } else if ( v == butLast ) {
             // Handle clicks for butLast
         } else if ( v == butStop ) {
@@ -126,9 +136,13 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
             // Handle clicks for butStop
         } else if ( v == butNext ) {
             // Handle clicks for butNext
+            playNext();
         } else if ( v == butScreen ) {
             // Handle clicks for butScreen
         }
+    }
+
+    private void playNext() {
     }
 
     //设置监听
@@ -163,22 +177,80 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        timeUtils = new TimeUtils();
+        super.onCreate(savedInstanceState);//初始化父类
+        inite();
         findViews();
          setListener();
         //获取播放地址
-        uri = getIntent().getData();
-        video_player_windown.setVideoURI(uri);
-        if (uri != null){
-            video_player_windown.setVideoURI(uri);
-        }
-
-
+       getData();
+       setData();;
         //设置暂停.播放.控制条
         //video_player_windown.setMediaController(new MediaController(this));
     }
 
+    private void setData(){
+        if (videoItemArrayList!=null && videoItemArrayList.size()>0){
+            VideoItem videoItem = videoItemArrayList.get(position);
+            tvName.setText(videoItem.getName());//视频名称
+            video_player_windown.setVideoPath(videoItem.getData());//获取视频资源
+        }else if (uri != null){
+            tvName.setText(uri.toString());
+            video_player_windown.setVideoURI(uri);
+        }else {
+            Toast.makeText(VideoPlayerWindownActivity.this,"没有视频",Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void getData(){
+        uri = getIntent().getData();
+        videoItemArrayList = (ArrayList<VideoItem>)getIntent().getSerializableExtra("videoList");
+        position = getIntent().getIntExtra("position",0);
+        video_player_windown.setVideoURI(uri);
+        if (uri != null){
+            video_player_windown.setVideoURI(uri);
+        }
+    }
+
+    public void inite(){
+        timeUtils = new TimeUtils();
+        //注册电量广播
+//        myReceiver =new  MyReceiver();
+//        IntentFilter intentFilter = new IntentFilter();
+//        //电量变化发送广播
+//        intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+//        registerReceiver(myReceiver,intentFilter);
+    }
+//    class MyReceiver extends BroadcastReceiver{
+//
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            //设置默认值
+//            int level = intent.getIntExtra("level",0);
+//            //setBattery(level);
+//        }
+
+//        private void setBattery(int level) {
+//            if (level<=0){
+//                ivBeteery.setBackgroundResource(R.drawable.battery_0);
+//            }
+//            else if (level<=10){
+//                ivBeteery.setBackgroundResource(R.drawable.battery_1);
+//            }
+//            else if (level<=30){
+//                ivBeteery.setBackgroundResource(R.drawable.battery_2);
+//            }
+//            else if (level<=50){
+//                ivBeteery.setBackgroundResource(R.drawable.battery_3);
+//            }
+//           else if (level<=70){
+//                ivBeteery.setBackgroundResource(R.drawable.battery_4);
+//            }
+//            else if (level<=100){
+//                ivBeteery.setBackgroundResource(R.drawable.battery_5);
+//            }else {
+//                ivBeteery.setBackgroundResource(R.drawable.battery_5);
+//            }
+//        }
+    //}
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
 
@@ -233,5 +305,36 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         public void onCompletion(MediaPlayer mp) {
             Toast.makeText(VideoPlayerWindownActivity.this,"Finish",Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        LogUtils.e("onRestart....");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+//        if (myReceiver!=null){
+//            unregisterReceiver(myReceiver);
+//            myReceiver = null;
+//        }
+        LogUtils.e("onDestroy....");
+        super.onDestroy();
     }
 }

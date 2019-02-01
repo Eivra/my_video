@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -74,11 +75,18 @@ public class VideoPage extends BasePage {
 //            intent.setDataAndType(uri, "video/*");
 //            context.startActivity(intent);
          //自定义播放器
+//            Intent intent = new Intent(context,VideoPlayerWindownActivity.class);
+//            String path = videoItem.getData();//该路径可以自定义
+//            File file = new File(path);
+//            Uri uri = Uri.fromFile(file);
+//            intent.setDataAndType(uri, "video/*");
+//            context.startActivity(intent);
+            //传递列表数据-对象-序列化
             Intent intent = new Intent(context,VideoPlayerWindownActivity.class);
-            String path = videoItem.getData();//该路径可以自定义
-            File file = new File(path);
-            Uri uri = Uri.fromFile(file);
-            intent.setDataAndType(uri, "video/*");
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("videoList",videoItemArrayList);
+            intent.putExtras(bundle);
+            intent.putExtra("position",position);
             context.startActivity(intent);
         }
     }

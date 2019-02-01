@@ -1,6 +1,8 @@
 package com.example.my_video.dto;
 
-public class VideoItem {
+import java.io.Serializable;
+
+public class VideoItem implements Serializable {//还有一种序列化方法是Parecelable
     private String name;//视频在sd卡的名称
     private long duration;//视频总时长
     private long size;//视频文件大小
