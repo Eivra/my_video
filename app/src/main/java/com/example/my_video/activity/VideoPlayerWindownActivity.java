@@ -121,6 +121,7 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
             // Handle clicks for butBack
             finish();
         } else if ( v == butLast ) {
+            playLast();
             // Handle clicks for butLast
         } else if ( v == butStop ) {
             //播放->暂停
@@ -139,10 +140,83 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
             playNext();
         } else if ( v == butScreen ) {
             // Handle clicks for butScreen
+
         }
     }
 
+    /**
+     * 播放上一个视频
+     */
+    private void playLast() {
+        if (videoItemArrayList!=null && videoItemArrayList.size()>0){
+            position--;
+            if (position>=0){
+                VideoItem videoItem = videoItemArrayList.get(position);
+                tvName.setText(videoItem.getName());
+                video_player_windown.setVideoPath(videoItem.getData());
+                //设置按钮状态
+                setButStatus();
+            }
+        }else if(uri !=null){
+            setButStatus();
+        }
+    }
+
+    /**
+     * 播放下一个视频
+     */
     private void playNext() {
+        if (videoItemArrayList!=null && videoItemArrayList.size()>0){
+            position++;
+            if (position<videoItemArrayList.size()){
+                VideoItem videoItem = videoItemArrayList.get(position);
+                tvName.setText(videoItem.getName());
+                video_player_windown.setVideoPath(videoItem.getData());
+                //设置按钮状态
+                setButStatus();
+            }
+        }else if(uri !=null){
+            setButStatus();
+        }
+    }
+
+    private void setButStatus() {
+        //1.只有一个视频
+        if (videoItemArrayList !=null && videoItemArrayList.size()>0){
+            if(videoItemArrayList.size()==1){
+                butLast.setBackgroundResource(R.drawable.last_press);
+                butLast.setEnabled(false);
+                butNext.setBackgroundResource(R.drawable.next_press);
+                butNext.setEnabled(false);
+            }
+            //2.两个视频
+            else if (videoItemArrayList.size()==2){
+                if (position==0){
+                    butLast.setBackgroundResource(R.drawable.last_press);
+                    butLast.setEnabled(false);
+                    butNext.setBackgroundResource(R.drawable.next);
+                    butNext.setEnabled(true);
+                }else if(position == videoItemArrayList.size()-1){
+                    butNext.setBackgroundResource(R.drawable.next_press);
+                    butNext.setEnabled(false);
+                    butLast.setBackgroundResource(R.drawable.last);
+                    butLast.setEnabled(true);
+                }else {
+                    if(position == 0){
+                        butLast.setBackgroundResource(R.drawable.last_press);
+                        butLast.setEnabled(false);
+                    } else if (position == 1){
+                        butNext.setBackgroundResource(R.drawable.next_press);
+                        butNext.setEnabled(false);
+                    }
+                }
+            }
+        }else if(uri != null){
+            butLast.setBackgroundResource(R.drawable.last_press);
+            butLast.setEnabled(false);
+            butNext.setBackgroundResource(R.drawable.next_press);
+            butNext.setEnabled(false);
+        }
     }
 
     //设置监听
@@ -199,6 +273,7 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         }else {
             Toast.makeText(VideoPlayerWindownActivity.this,"没有视频",Toast.LENGTH_SHORT).show();
         }
+        setButStatus();
     }
     private void getData(){
         uri = getIntent().getData();
@@ -303,7 +378,8 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
     private class MyOnCompletionListener implements MediaPlayer.OnCompletionListener {
         @Override
         public void onCompletion(MediaPlayer mp) {
-            Toast.makeText(VideoPlayerWindownActivity.this,"Finish",Toast.LENGTH_SHORT).show();
+            Toast.makeText(VideoPlayerWindownActivity.this,"播放下一个视频",Toast.LENGTH_SHORT).show();
+            playNext();
         }
     }
 
