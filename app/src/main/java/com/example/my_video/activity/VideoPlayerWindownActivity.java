@@ -16,15 +16,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.example.my_video.R;
 import com.example.my_video.dto.VideoItem;
 import com.example.my_video.utils.LogUtils;
 import com.example.my_video.utils.TimeUtils;
+import com.example.my_video.view.VideoView;
 
 import java.util.ArrayList;
 
@@ -54,6 +55,7 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
     private GestureDetector detector;//手势识别器
 
     private static final int PROGRESS = 1;
+    private static final int Hide_MiediaController=2;
     private LinearLayout top;
     private TextView tvName;
     private ImageView ivBeteery;
@@ -71,6 +73,8 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
     private Button butStop;
     private Button butNext;
     private Button butScreen;
+    private RelativeLayout mediaConctroller;
+    private Boolean isShowMediaConctroller=false;
 
     /**
      * Find the Views in the layout<br />
@@ -98,6 +102,7 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         butNext = (Button)findViewById( R.id.but_next );
         butScreen = (Button)findViewById( R.id.but_screen );
         video_player_windown = findViewById(R.id.video_player_windown);
+        mediaConctroller=(RelativeLayout) findViewById(R.id.media_conctroller);
 
         butVoice.setOnClickListener(this);
         selectVideo.setOnClickListener( this );
@@ -136,6 +141,8 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
             // Handle clicks for butScreen
 
         }
+        handler.removeMessages(Hide_MiediaController);
+        handler.sendEmptyMessageDelayed(Hide_MiediaController,3000);
     }
 
     private void playAndstop(){
@@ -247,14 +254,15 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
             }
         }
 
+        //当手指离开屏幕 时回调的方法
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
-
+            handler.removeMessages(Hide_MiediaController);
         }
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
-
+            handler.sendEmptyMessageDelayed(Hide_MiediaController,3000);
         }
     }
 
@@ -263,10 +271,10 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         super.onCreate(savedInstanceState);//初始化父类
         inite();
         findViews();
-         setListener();
+        setListener();
         //获取播放地址
-       getData();
-       setData();;
+         getData();
+         setData();;
         //设置暂停.播放.控制条
         //video_player_windown.setMediaController(new MediaController(this));
 
@@ -278,18 +286,28 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
             }
 
             /**
-             * 单击暂停或者播放
+             * 单击暂停、播放、显示控制面板
              * @param e
              * @return
              */
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
-                playAndstop();
+               // playAndstop();
+                //显示->隐藏
+                if (isShowMediaConctroller){
+                    hideMiediaController();
+                    handler.removeMessages(Hide_MiediaController);
+                }else {
+                    //隐藏->显示
+                    showMiediaController();
+                    handler.sendEmptyMessageDelayed(Hide_MiediaController,3000);
+                }
                 return super.onSingleTapConfirmed(e);
             }
 
             @Override
             public boolean onDoubleTap(MotionEvent e) {
+                playAndstop();
                 Toast.makeText(VideoPlayerWindownActivity.this,"onDoubleTap",Toast.LENGTH_SHORT).show();
                 return super.onDoubleTap(e);
             }
@@ -370,6 +388,7 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
        public void handleMessage(Message msg) {
            super.handleMessage(msg);
            switch (msg.what){
+               case Hide_MiediaController: hideMiediaController(); break;
                case PROGRESS:
                //获取当前视频位置
                   int currentPosition = video_player_windown.getCurrentPosition();
@@ -395,9 +414,13 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
             sbTime.setMax(duration);
             //发消息（Handler）
             handler.sendEmptyMessage(PROGRESS);
-
+            //默认隐藏控制面板
+            hideMiediaController();
             //设置文本时间
+
             tvAllTime.setText(timeUtils.stringForTime(duration));
+            //设置视频窗口实际大小
+            video_player_windown.setVideoSize(mp.getVideoWidth(),mp.getVideoHeight());
         }
     }
 
@@ -453,4 +476,16 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         detector.onTouchEvent(event);
         return super.onTouchEvent(event);
     }
+
+    //显示控件
+    public void showMiediaController(){
+        mediaConctroller.setVisibility(View.VISIBLE);
+        isShowMediaConctroller=true;
+    }
+    //隐藏控件
+    public void hideMiediaController(){
+        mediaConctroller.setVisibility(View.GONE);
+        isShowMediaConctroller=false;
+    }
+
 }

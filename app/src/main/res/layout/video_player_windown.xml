@@ -5,10 +5,10 @@
     android:background="#000000"
     android:layout_height="match_parent">
 
-    <VideoView
+    <com.example.my_video.view.VideoView
         android:id="@+id/video_player_windown"
         android:layout_centerInParent="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-    <include layout="@layout/media_conctroller"/>
+    <include layout="@layout/media_conctroller" android:id="@+id/media_conctroller"/>
 </RelativeLayout>
