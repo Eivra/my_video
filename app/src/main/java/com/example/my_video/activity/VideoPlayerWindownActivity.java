@@ -1,15 +1,12 @@
 package com.example.my_video.activity;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.DisplayMetrics;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -55,7 +52,10 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
     private GestureDetector detector;//手势识别器
 
     private static final int PROGRESS = 1;
-    private static final int Hide_MiediaController=2;
+    private static final int Hide_MiediaController=2;//控制面板
+    private static final int FULL_SCREEN = 1;//全屏
+    private static final int DEFAULT_SCREEN = 2;//默认
+
     private LinearLayout top;
     private TextView tvName;
     private ImageView ivBeteery;
@@ -74,7 +74,15 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
     private Button butNext;
     private Button butScreen;
     private RelativeLayout mediaConctroller;
-    private Boolean isShowMediaConctroller=false;
+
+    private Boolean isShowMediaConctroller=false;//是否显示控制面板
+    private Boolean ifFullScreen = false;//是否全屏
+
+    private int screenWidth =0;//屏幕宽
+    private int screenHeight = 0;//屏幕高
+
+    private int videoWidth;//真实视频宽
+    private int videoHeight;//真实视频高
 
     /**
      * Find the Views in the layout<br />
@@ -139,7 +147,7 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
             playNext();
         } else if ( v == butScreen ) {
             // Handle clicks for butScreen
-
+            screenIsFull();
         }
         handler.removeMessages(Hide_MiediaController);
         handler.sendEmptyMessageDelayed(Hide_MiediaController,3000);
@@ -281,8 +289,9 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         detector = new GestureDetector(this,new GestureDetector.SimpleOnGestureListener(){
             @Override
             public void onLongPress(MotionEvent e) {
+                playAndstop();
                 super.onLongPress(e);
-                Toast.makeText(VideoPlayerWindownActivity.this,"onLongPress",Toast.LENGTH_SHORT).show();
+                //Toast.makeText(VideoPlayerWindownActivity.this,"onLongPress",Toast.LENGTH_SHORT).show();
             }
 
             /**
@@ -307,11 +316,47 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
 
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                playAndstop();
-                Toast.makeText(VideoPlayerWindownActivity.this,"onDoubleTap",Toast.LENGTH_SHORT).show();
+               screenIsFull();
+                //Toast.makeText(VideoPlayerWindownActivity.this,"onDoubleTap",Toast.LENGTH_SHORT).show();
                 return super.onDoubleTap(e);
             }
+
         });
+        //得到屏幕的宽和高
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        screenWidth = displayMetrics.widthPixels;
+        screenHeight = displayMetrics.heightPixels;
+    }
+    private void setVideoType(int defaultScreen) {
+        switch (defaultScreen){
+            case FULL_SCREEN:
+                //设置屏幕大小
+                video_player_windown.setVideoSize(screenWidth,screenHeight);
+                //按钮状态
+                butScreen.setBackgroundResource(R.drawable.big);
+
+                ifFullScreen = true;
+                break;
+            case DEFAULT_SCREEN:
+                int mVideoWidth = videoWidth;//视频真实宽
+                int mVideoHeight = videoHeight;//视频真实高
+
+                int width = screenWidth;//屏幕的宽
+                int height = screenHeight;//屏幕的高
+                // for compatibility, we adjust size based on aspect ratio
+                if ( mVideoWidth * height  < width * mVideoHeight ) {
+                    //Log.i("@@@", "image too wide, correcting");
+                    width = height * mVideoWidth / mVideoHeight;
+                } else if ( mVideoWidth * height  > width * mVideoHeight ) {
+                    //Log.i("@@@", "image too tall, correcting");
+                    height = width * mVideoHeight / mVideoWidth;
+                }
+                video_player_windown.setVideoSize(width,height);
+                butScreen.setBackgroundResource(R.drawable.little);
+                ifFullScreen = false;
+                break;
+        }
     }
 
     private void setData(){
@@ -334,6 +379,15 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         video_player_windown.setVideoURI(uri);
         if (uri != null){
             video_player_windown.setVideoURI(uri);
+        }
+    }
+    public void screenIsFull(){
+        if(ifFullScreen){
+            //默认
+            setVideoType(DEFAULT_SCREEN);
+        }else {
+            //全屏
+            setVideoType(FULL_SCREEN);
         }
     }
 
@@ -408,6 +462,8 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
 
         @Override
         public void onPrepared(MediaPlayer mp) {
+            videoWidth = mp.getVideoWidth();
+            videoHeight = mp.getVideoHeight();
             video_player_windown.start();
             //获取视频总时间
             int duration = video_player_windown.getDuration();
@@ -420,7 +476,8 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
 
             tvAllTime.setText(timeUtils.stringForTime(duration));
             //设置视频窗口实际大小
-            video_player_windown.setVideoSize(mp.getVideoWidth(),mp.getVideoHeight());
+            //video_player_windown.setVideoSize(mp.getVideoWidth(),mp.getVideoHeight());
+            setVideoType(DEFAULT_SCREEN);//默认屏幕播放
         }
     }
 
