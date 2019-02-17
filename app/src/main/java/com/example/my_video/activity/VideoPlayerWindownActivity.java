@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -406,13 +407,6 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
 
     public void inite(){
         timeUtils = new TimeUtils();
-        //注册电量广播
-//        myReceiver =new  MyReceiver();
-//        IntentFilter intentFilter = new IntentFilter();
-//        //电量变化发送广播
-//        intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
-//        registerReceiver(myReceiver,intentFilter);
-
 
         detector = new GestureDetector(this,new GestureDetector.SimpleOnGestureListener(){
             @Override
@@ -462,38 +456,6 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         maxVoice = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 
     }
-//    class MyReceiver extends BroadcastReceiver{
-//
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            //设置默认值
-//            int level = intent.getIntExtra("level",0);
-//            //setBattery(level);
-//        }
-
-//        private void setBattery(int level) {
-//            if (level<=0){
-//                ivBeteery.setBackgroundResource(R.drawable.battery_0);
-//            }
-//            else if (level<=10){
-//                ivBeteery.setBackgroundResource(R.drawable.battery_1);
-//            }
-//            else if (level<=30){
-//                ivBeteery.setBackgroundResource(R.drawable.battery_2);
-//            }
-//            else if (level<=50){
-//                ivBeteery.setBackgroundResource(R.drawable.battery_3);
-//            }
-//           else if (level<=70){
-//                ivBeteery.setBackgroundResource(R.drawable.battery_4);
-//            }
-//            else if (level<=100){
-//                ivBeteery.setBackgroundResource(R.drawable.battery_5);
-//            }else {
-//                ivBeteery.setBackgroundResource(R.drawable.battery_5);
-//            }
-//        }
-    //}
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
 
@@ -590,9 +552,34 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         super.onDestroy();
     }
 
+    private float startyY;
+    private float touchRang;
+    private int mVol;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         detector.onTouchEvent(event);
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN://手指按下 0
+                startyY = event.getY();
+                mVol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+                touchRang = Math.min(screenHeight,screenWidth);
+                handler.removeMessages(HIDE_MEDIACONTROLLER);
+                break;
+            case MotionEvent.ACTION_MOVE://手指移开 1
+                float endY = event.getY();
+                float distanceY = startyY-endY;
+                float alterVoice = (distanceY/touchRang)*maxVoice;
+                int voice = (int) Math.min(Math.max(mVol+alterVoice,0),maxVoice);
+                if (alterVoice != 0){
+                    isMute = false;
+                    updateVoice(voice,isMute);
+                }
+                break;
+            case MotionEvent.ACTION_UP://手指离开 2
+                handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+                break;
+        }
         return super.onTouchEvent(event);
     }
 
@@ -607,4 +594,27 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         isShowMediaConctroller=false;
     }
 
+    /**
+     * 与系统声音同步增减
+     * @param keyCode
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == event.KEYCODE_VOLUME_DOWN){
+            currentVoice--;
+            updateVoice(currentVoice,false);
+            handler.removeMessages(HIDE_MEDIACONTROLLER);
+            handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+            return true;
+        }else if (keyCode == event.KEYCODE_VOLUME_UP){
+            currentVoice++;
+            updateVoice(currentVoice,false);
+            handler.removeMessages(HIDE_MEDIACONTROLLER);
+            handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 }
