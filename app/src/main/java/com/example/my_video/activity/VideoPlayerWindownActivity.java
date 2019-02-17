@@ -1,6 +1,7 @@
 package com.example.my_video.activity;
 
 import android.app.Activity;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -52,7 +53,7 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
     private GestureDetector detector;//手势识别器
 
     private static final int PROGRESS = 1;
-    private static final int Hide_MiediaController=2;//控制面板
+    private static final int HIDE_MEDIACONTROLLER =2;//控制面板
     private static final int FULL_SCREEN = 1;//全屏
     private static final int DEFAULT_SCREEN = 2;//默认
 
@@ -83,6 +84,11 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
 
     private int videoWidth;//真实视频宽
     private int videoHeight;//真实视频高
+
+    private AudioManager am;
+    private int currentVoice;//当前音量
+    private int maxVoice;//最大音量
+    private boolean isMute = false;
 
     /**
      * Find the Views in the layout<br />
@@ -119,6 +125,10 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         butStop.setOnClickListener( this );
         butNext.setOnClickListener( this );
         butScreen.setOnClickListener( this );
+
+        //音量关联seekBar
+        sbVoice.setMax(maxVoice);//最大音量
+        sbVoice.setProgress(currentVoice);
     }
 
     /**
@@ -130,6 +140,8 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
     @Override
     public void onClick(View v) {
         if ( v == butVoice ) {
+            isMute = !isMute;
+            updateVoice(currentVoice,isMute);
             // Handle clicks for butVoice
         } else if ( v == selectVideo ) {
             // Handle clicks for selectVideo
@@ -149,8 +161,8 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
             // Handle clicks for butScreen
             screenIsFull();
         }
-        handler.removeMessages(Hide_MiediaController);
-        handler.sendEmptyMessageDelayed(Hide_MiediaController,3000);
+        handler.removeMessages(HIDE_MEDIACONTROLLER);
+        handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
     }
 
     private void playAndstop(){
@@ -251,8 +263,48 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
 
         //设置seekBar监听
         sbTime.setOnSeekBarChangeListener(new videoSeekBarChangeListener());
+        sbVoice.setOnSeekBarChangeListener(new voiceOnSeekBarListener());
     }
 
+    /**
+     * 设置音量大小
+     * @param progress
+     */
+    private void updateVoice(int progress,boolean isMute) {
+        if(isMute){
+            am.setStreamVolume(AudioManager.STREAM_MUSIC,0,0);
+            sbVoice.setProgress(0);
+        }else{
+            am.setStreamVolume(AudioManager.STREAM_MUSIC,progress,0);
+            sbVoice.setProgress(progress);
+            currentVoice = progress;
+        }
+    }
+
+    class voiceOnSeekBarListener implements SeekBar.OnSeekBarChangeListener{
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            if(fromUser){
+                if(progress >0 ){
+                    isMute = false;
+                }else{
+                    isMute = true;
+                }
+                updateVoice(progress,isMute);
+            }
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+            handler.removeMessages(HIDE_MEDIACONTROLLER);
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,5000);
+        }
+    }
     class videoSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
 
         @Override
@@ -265,14 +317,16 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         //当手指离开屏幕 时回调的方法
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
-            handler.removeMessages(Hide_MiediaController);
+            handler.removeMessages(HIDE_MEDIACONTROLLER);
         }
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
-            handler.sendEmptyMessageDelayed(Hide_MiediaController,3000);
+            handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,5000);
         }
     }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -284,49 +338,8 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
          getData();
          setData();;
         //设置暂停.播放.控制条
-        //video_player_windown.setMediaController(new MediaController(this));
+       // video_player_windown.setMediaController(new MediaController(this));
 
-        detector = new GestureDetector(this,new GestureDetector.SimpleOnGestureListener(){
-            @Override
-            public void onLongPress(MotionEvent e) {
-                playAndstop();
-                super.onLongPress(e);
-                //Toast.makeText(VideoPlayerWindownActivity.this,"onLongPress",Toast.LENGTH_SHORT).show();
-            }
-
-            /**
-             * 单击暂停、播放、显示控制面板
-             * @param e
-             * @return
-             */
-            @Override
-            public boolean onSingleTapConfirmed(MotionEvent e) {
-               // playAndstop();
-                //显示->隐藏
-                if (isShowMediaConctroller){
-                    hideMiediaController();
-                    handler.removeMessages(Hide_MiediaController);
-                }else {
-                    //隐藏->显示
-                    showMiediaController();
-                    handler.sendEmptyMessageDelayed(Hide_MiediaController,3000);
-                }
-                return super.onSingleTapConfirmed(e);
-            }
-
-            @Override
-            public boolean onDoubleTap(MotionEvent e) {
-               screenIsFull();
-                //Toast.makeText(VideoPlayerWindownActivity.this,"onDoubleTap",Toast.LENGTH_SHORT).show();
-                return super.onDoubleTap(e);
-            }
-
-        });
-        //得到屏幕的宽和高
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        screenWidth = displayMetrics.widthPixels;
-        screenHeight = displayMetrics.heightPixels;
     }
     private void setVideoType(int defaultScreen) {
         switch (defaultScreen){
@@ -399,6 +412,55 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
 //        //电量变化发送广播
 //        intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
 //        registerReceiver(myReceiver,intentFilter);
+
+
+        detector = new GestureDetector(this,new GestureDetector.SimpleOnGestureListener(){
+            @Override
+            public void onLongPress(MotionEvent e) {
+                playAndstop();
+                super.onLongPress(e);
+                //Toast.makeText(VideoPlayerWindownActivity.this,"onLongPress",Toast.LENGTH_SHORT).show();
+            }
+
+            /**
+             * 单击暂停、播放、显示控制面板
+             * @param e
+             * @return
+             */
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                // playAndstop();
+                //显示->隐藏
+                if (isShowMediaConctroller){
+                    hideMiediaController();
+                    handler.removeMessages(HIDE_MEDIACONTROLLER);
+                }else {
+                    //隐藏->显示
+                    showMiediaController();
+                    handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,5000);
+                }
+                return super.onSingleTapConfirmed(e);
+            }
+
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                screenIsFull();
+                //Toast.makeText(VideoPlayerWindownActivity.this,"onDoubleTap",Toast.LENGTH_SHORT).show();
+                return super.onDoubleTap(e);
+            }
+
+        });
+        //得到屏幕的宽和高
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        screenWidth = displayMetrics.widthPixels;
+        screenHeight = displayMetrics.heightPixels;
+
+        //获取音量
+        am = (AudioManager) getSystemService(AUDIO_SERVICE);
+        currentVoice = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        maxVoice = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+
     }
 //    class MyReceiver extends BroadcastReceiver{
 //
@@ -442,7 +504,7 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
        public void handleMessage(Message msg) {
            super.handleMessage(msg);
            switch (msg.what){
-               case Hide_MiediaController: hideMiediaController(); break;
+               case HIDE_MEDIACONTROLLER: hideMiediaController(); break;
                case PROGRESS:
                //获取当前视频位置
                   int currentPosition = video_player_windown.getCurrentPosition();
