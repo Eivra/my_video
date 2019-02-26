@@ -25,6 +25,12 @@
             android:configChanges="keyboardHidden|screenSize|orientation"/>
 
         <activity android:name=".activity.AuideoPlayerWindownActivity"/>
+
+        <service android:name=".service.MyMusicPlayService">
+            <intent-filter>
+                <action android:name="com.example.my_video.service.MyMusicPlayService"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
