@@ -105,7 +105,7 @@ public class VideoPage extends BasePage {
             if (videoItemArrayList != null && videoItemArrayList.size()>0){
                 //有数据
                 //设置适配器
-                videoAdapter = new VideoAdapter(context,videoItemArrayList);
+                videoAdapter = new VideoAdapter(context,videoItemArrayList,true);
                 listView.setAdapter(videoAdapter);
                 //隐藏文本
                 nonView.setVisibility(View.GONE);

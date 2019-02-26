@@ -10,18 +10,19 @@ import android.widget.TextView;
 
 import com.example.my_video.R;
 import com.example.my_video.dto.VideoItem;
-import com.example.my_video.page.VideoPage;
 import com.example.my_video.utils.TimeUtils;
 
 import java.util.ArrayList;
 
 public class VideoAdapter extends BaseAdapter {
+    private final boolean isVideo;
     private Context context;
     private ArrayList<VideoItem> videoItemArrayList;
     private TimeUtils timeUtils;
-    public  VideoAdapter(Context context,ArrayList<VideoItem> videoPageVideoItemArrayList){
+    public  VideoAdapter(Context context,ArrayList<VideoItem> videoPageVideoItemArrayList,boolean isAudio){
         this.context=context;
         this.videoItemArrayList=videoPageVideoItemArrayList;
+        this.isVideo = isAudio;
         timeUtils = new TimeUtils();
 
     }
@@ -60,6 +61,11 @@ public class VideoAdapter extends BaseAdapter {
         viewHold.tv_videoName.setText(videoItems.getName());
         viewHold.tv_videoSize.setText(Formatter.formatFileSize(context,videoItems.getSize()));
         viewHold.tv_videoTime.setText(timeUtils.stringForTime((int)videoItems.getDuration()));
+
+        if (!isVideo){
+            viewHold.iv_image.setImageResource(R.drawable.audiologo);
+        }
+
         return convertView;
     }
     static class ViewHold{

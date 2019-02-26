@@ -24,6 +24,7 @@
             android:screenOrientation="landscape"
             android:configChanges="keyboardHidden|screenSize|orientation"/>
 
+        <activity android:name=".activity.AuideoPlayerWindownActivity"/>
     </application>
 
 </manifest>
