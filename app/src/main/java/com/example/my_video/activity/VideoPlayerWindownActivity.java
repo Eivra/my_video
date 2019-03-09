@@ -50,7 +50,7 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
     private TimeUtils timeUtils;
     private ArrayList<VideoItem> videoItemArrayList;//视频列表
     int position;//播放列表中的位置
-    //private MyReceiver myReceiver;//监听电量广播
+    private AuideoPlayerWindownActivity.MyReceiver myReceiver;//监听电量广播
     private GestureDetector detector;//手势识别器
 
     private static final int PROGRESS = 1;
@@ -544,10 +544,11 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
 
     @Override
     protected void onDestroy() {
-//        if (myReceiver!=null){
-//            unregisterReceiver(myReceiver);
-//            myReceiver = null;
-//        }
+        handler.removeCallbacksAndMessages(null);
+        if (myReceiver!=null){
+            unregisterReceiver(myReceiver);
+            myReceiver = null;
+        }
         LogUtils.e("onDestroy....");
         super.onDestroy();
     }

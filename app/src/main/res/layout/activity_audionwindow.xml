@@ -92,7 +92,7 @@
                 android:layout_width="10dp"
                 android:layout_height="40dp" />
             <Button
-                android:id="@+id/but_audio_screen"
+                android:id="@+id/but_audio_lyric"
                 android:layout_marginLeft="5dp"
                 android:layout_weight="0.5"
                 android:background="@drawable/but_audio_text"

@@ -75,4 +75,9 @@ interface IMyMusicPlayService {
      * @return
      */
     int getPlayMaodel();
+
+    boolean isPlay();
+
+    //拖动进度位置
+    void toSeekBar(int position);
 }

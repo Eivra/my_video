@@ -23,6 +23,7 @@ public class MyMusicPlayService extends Service {
     private VideoItem videoItem;
     private int position;
     private MediaPlayer mediaPlayer;//视频音频都可以播放
+    public static final String Audio = "com.example.my_video.service.MyMusicPlayService" ;
 
     @Override
     public void onCreate() {
@@ -115,7 +116,7 @@ public class MyMusicPlayService extends Service {
 
         @Override
         public void stop() throws RemoteException {
-            service.stop();;
+            service.stop();
         }
 
         @Override
@@ -162,6 +163,16 @@ public class MyMusicPlayService extends Service {
         public int getPlayMaodel() throws RemoteException {
             return service.getPlayMaodel();
         }
+
+        @Override
+        public boolean isPlay() throws RemoteException {
+            return service.isPlay();
+        }
+
+        @Override
+        public void toSeekBar(int position) throws RemoteException {
+            mediaPlayer.seekTo(position);
+        }
     };
     @Override
     public IBinder onBind(Intent intent) {
@@ -194,7 +205,6 @@ public class MyMusicPlayService extends Service {
      * 停止
      */
     private void stop(){
-
     }
 
     /**
@@ -202,7 +212,7 @@ public class MyMusicPlayService extends Service {
      * @return
      */
     private int getCurrPosition(){
-        return 0;
+        return mediaPlayer.getCurrentPosition();
     }
 
     /**
@@ -210,7 +220,7 @@ public class MyMusicPlayService extends Service {
      * @return
      */
     private int getDuration(){
-        return 0;
+        return mediaPlayer.getDuration();
     }
 
     /**
@@ -218,14 +228,14 @@ public class MyMusicPlayService extends Service {
      * @return
      */
     private String getSingerName(){
-        return "";
+        return videoItem.getName();
     }
 
     /**
      * 获取歌曲名
      */
     private String getSongName(){
-        return "";
+        return videoItem.getArtist();
     }
 
     /**
@@ -266,11 +276,26 @@ public class MyMusicPlayService extends Service {
         return 0;
     }
 
+    private boolean isPlay(){
+        return mediaPlayer.isPlaying();
+    }
+
     class OnMyPreparedListener implements MediaPlayer.OnPreparedListener{
 
         @Override
         public void onPrepared(MediaPlayer mp) {
+            //通知Activity获取信息
+            notifyChange(Audio);
             start();
+        }
+
+        /**
+         * 根据动作发广播
+         * @param audio
+         */
+        private void notifyChange(String audio) {
+            Intent intent = new Intent(audio);
+            sendBroadcast(intent);
         }
     }
 
