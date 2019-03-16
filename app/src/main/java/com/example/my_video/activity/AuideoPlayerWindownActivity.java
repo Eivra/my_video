@@ -13,10 +13,12 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.my_video.IMyMusicPlayService;
 import com.example.my_video.R;
@@ -30,6 +32,7 @@ public class AuideoPlayerWindownActivity extends Activity implements View.OnClic
     private IMyMusicPlayService iMyMusicPlayService;
     private MyReceiver myReceiver;
     private TimeUtils timeUtils;
+    private Boolean notification;//true是从状态栏进入 否则重新播放
 
     private TextView singerName;
     private TextView lyrics;
@@ -52,7 +55,12 @@ public class AuideoPlayerWindownActivity extends Activity implements View.OnClic
 
             if (iMyMusicPlayService != null){
                 try {
-                    iMyMusicPlayService.openAudio(position);
+                    if (!notification){
+                        iMyMusicPlayService.openAudio(position);
+                    }else {
+                        System.out.println("Thread Name:"+Thread.currentThread());
+                        showAudioData();
+                    }
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -140,9 +148,21 @@ public class AuideoPlayerWindownActivity extends Activity implements View.OnClic
     @Override
     public void onClick(View v) {
         if ( v == butAudioBack ) {
+            try {
+                setPlayModel();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             // Handle clicks for butAudioBack
         } else if ( v == butAudioLast ) {
             // Handle clicks for butAudioLast
+            if (iMyMusicPlayService != null){
+                try {
+                    iMyMusicPlayService.pre();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
         } else if ( v == butAudioStop ) {
             // Handle clicks for butAudioStop
             if (iMyMusicPlayService!=null){
@@ -162,8 +182,65 @@ public class AuideoPlayerWindownActivity extends Activity implements View.OnClic
             }
         } else if ( v == butAudioNext ) {
             // Handle clicks for butAudioNext
+            if(iMyMusicPlayService != null){
+                try {
+                    iMyMusicPlayService.next();
+                    LogUtils.e("点击下一首。。。。");
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
         } else if ( v == butAudioLyric ) {
             // Handle clicks for butAudioLyric
+        }
+    }
+
+
+    //模式切换
+    private void setPlayModel() throws RemoteException {
+        int playMadel = iMyMusicPlayService.getPlayMaodel();
+        if (playMadel == MyMusicPlayService.NORMAL){
+            playMadel = MyMusicPlayService.SINGLE;
+        }else if(playMadel == MyMusicPlayService.SINGLE){
+            playMadel = MyMusicPlayService.ALL;
+        }else if(playMadel == MyMusicPlayService.ALL){
+            playMadel = MyMusicPlayService.NORMAL;
+        }else {
+            playMadel = MyMusicPlayService.NORMAL;
+        }
+        //保存状态
+        iMyMusicPlayService.setPlayMaodel(playMadel);
+        //设置图片
+        setPlayModelImage();
+    }
+
+    private void setPlayModelImage() throws RemoteException {
+        int playMadel = iMyMusicPlayService.getPlayMaodel();
+        if (playMadel == MyMusicPlayService.NORMAL){
+            butAudioBack.setBackgroundResource(R.drawable.audio_order);
+            Toast.makeText(AuideoPlayerWindownActivity.this,"顺序播放",Toast.LENGTH_SHORT);
+        }else if(playMadel == MyMusicPlayService.SINGLE){
+            butAudioBack.setBackgroundResource(R.drawable.rollback);
+            Toast.makeText(AuideoPlayerWindownActivity.this,"单曲循环",Toast.LENGTH_SHORT);
+        }else if(playMadel == MyMusicPlayService.ALL){
+            butAudioBack.setBackgroundResource(R.drawable.audio_random);
+            Toast.makeText(AuideoPlayerWindownActivity.this,"随机播放",Toast.LENGTH_SHORT);
+        }else {
+            butAudioBack.setBackgroundResource(R.drawable.audio_order);
+            Toast.makeText(AuideoPlayerWindownActivity.this,"顺序播放",Toast.LENGTH_SHORT);
+        }
+    }
+
+    private void checkModelPlay() throws RemoteException {
+        int playMadel = iMyMusicPlayService.getPlayMaodel();
+        if (playMadel == MyMusicPlayService.NORMAL){
+            butAudioBack.setBackgroundResource(R.drawable.audio_order);
+        }else if(playMadel == MyMusicPlayService.SINGLE){
+            butAudioBack.setBackgroundResource(R.drawable.rollback);
+        }else if(playMadel == MyMusicPlayService.ALL){
+            butAudioBack.setBackgroundResource(R.drawable.audio_random);
+        }else {
+            butAudioBack.setBackgroundResource(R.drawable.audio_order);
         }
     }
 
@@ -209,21 +286,26 @@ public class AuideoPlayerWindownActivity extends Activity implements View.OnClic
         @Override
         public void onReceive(Context context, Intent intent) {
             showAudioData();
-        }
-
-        private void showAudioData() {
             try {
-                //歌名
-                singerName.setText(iMyMusicPlayService.getSingerName());
-                //歌唱者名字
-                lyrics.setText(iMyMusicPlayService.getSongName());
-                sbVoice.setMax(iMyMusicPlayService.getDuration());
-
-                //发消息
-                handler.sendEmptyMessage(PROGRESS);
+                checkModelPlay();
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void showAudioData() {
+        try {
+            //歌名
+            singerName.setText(iMyMusicPlayService.getSingerName());
+            //歌唱者名字
+            lyrics.setText(iMyMusicPlayService.getSongName());
+            sbVoice.setMax(iMyMusicPlayService.getDuration());
+
+            //发消息
+            handler.sendEmptyMessage(PROGRESS);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 
@@ -235,7 +317,11 @@ public class AuideoPlayerWindownActivity extends Activity implements View.OnClic
     }
 
     private void getData() {
-        position = getIntent().getIntExtra("position",0);
+        notification = getIntent().getBooleanExtra("Notification",false);
+        if (!notification){
+            position = getIntent().getIntExtra("position",0);
+        }
+
     }
 
     protected void onDestroy() {

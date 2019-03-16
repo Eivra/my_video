@@ -12,12 +12,15 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.widget.Toast;
 
 import com.example.my_video.IMyMusicPlayService;
 import com.example.my_video.R;
 import com.example.my_video.activity.AuideoPlayerWindownActivity;
 import com.example.my_video.dto.VideoItem;
+import com.example.my_video.utils.CacheUtils;
+import com.example.my_video.utils.LogUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,11 +31,17 @@ public class MyMusicPlayService extends Service {
     private VideoItem videoItem;
     private int position;
     private MediaPlayer mediaPlayer;//视频音频都可以播放
+    public static final int NORMAL = 1;//顺序播放
+    public static final int SINGLE = 2;//单曲循环
+    public static final int ALL = 3;//全部循环
+
+    private int playMode = 1;
     public static final String Audio = "com.example.my_video.service.MyMusicPlayService" ;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        playMode = CacheUtils.getPlaymode(this,"playMode");
         getFromLocal();
     }
 
@@ -91,27 +100,6 @@ public class MyMusicPlayService extends Service {
         @Override
         public void openAudio(int position) throws RemoteException {
             service.openAudio(position);
-            if (videoItemArrayList != null && videoItemArrayList.size() >0){
-                videoItem = videoItemArrayList.get(position);
-                if (mediaPlayer != null){
-                    //mediaPlayer.release();//释放
-                    mediaPlayer.reset();
-                }
-
-                try {
-                    mediaPlayer = new MediaPlayer();
-                    mediaPlayer.setOnPreparedListener(new OnMyPreparedListener());
-                    mediaPlayer.setOnCompletionListener(new OnMySeekCompleteListener());
-                    mediaPlayer.setOnErrorListener(new OnMyErrorListener());
-
-                    mediaPlayer.setDataSource(videoItem.getData());
-                    mediaPlayer.prepareAsync();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }else {
-                Toast.makeText(MyMusicPlayService.this,"没有数据",Toast.LENGTH_SHORT).show();
-            }
         }
 
         @Override
@@ -159,8 +147,7 @@ public class MyMusicPlayService extends Service {
             service.pre();
         }
 
-        @Override
-        public void setPlayMaodel(int platModel) throws RemoteException {
+        public void setPlayMaodel(int platModel){
             service.setPlayMaodel(platModel);
         }
 
@@ -209,6 +196,33 @@ public class MyMusicPlayService extends Service {
      */
     private void openAudio(int position){
         this.position = position;
+        if (videoItemArrayList != null && videoItemArrayList.size() >0){
+            videoItem = videoItemArrayList.get(position);
+            if (mediaPlayer != null){
+                //mediaPlayer.release();//释放
+                mediaPlayer.reset();
+            }
+
+            try {
+                mediaPlayer = new MediaPlayer();
+                mediaPlayer.setOnPreparedListener(new OnMyPreparedListener());
+                mediaPlayer.setOnCompletionListener(new OnMySeekCompleteListener());
+                mediaPlayer.setOnErrorListener(new OnMyErrorListener());
+
+                mediaPlayer.setDataSource(videoItem.getData());
+                mediaPlayer.prepareAsync();
+
+                if (playMode == MyMusicPlayService.SINGLE){
+                    mediaPlayer.setLooping(true);
+                }else {
+                    mediaPlayer.setLooping(false);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else {
+            Toast.makeText(MyMusicPlayService.this,"没有数据",Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -267,14 +281,110 @@ public class MyMusicPlayService extends Service {
      * 播放下一个
      */
     private void next(){
+        //1.根据当前模式设置下一个位置
+        setNextPosition();
+        //2.根据当前的播放模式和下标位置去播放音频
+        playNextAudio();
+    }
 
+    private void playNextAudio() {
+        int playMadel = getPlayMaodel();
+        if (playMadel == MyMusicPlayService.NORMAL){
+            if (position < videoItemArrayList.size()){
+                openAudio(position);
+                LogUtils.e("播放下一首");
+            }else {
+                position = videoItemArrayList.size()-1;
+                Toast.makeText(MyMusicPlayService.this,"最后一首",Toast.LENGTH_SHORT).show();
+            }
+        }else if(playMadel == MyMusicPlayService.SINGLE){
+            openAudio(position);
+        }else if(playMadel == MyMusicPlayService.ALL){
+            openAudio(position);
+        }else {
+            if (position < videoItemArrayList.size()){
+                openAudio(position);
+            }else {
+                position = videoItemArrayList.size()-1;
+            }
+        }
+    }
+
+    private void setNextPosition() {
+        int playMadel = getPlayMaodel();
+        if (playMadel == MyMusicPlayService.NORMAL){
+           position++;
+            LogUtils.e("+++++++++++++"+position);
+            LogUtils.e("b播放模式"+playMadel);
+        }else if(playMadel == MyMusicPlayService.SINGLE){
+            position++;
+            if(position >=videoItemArrayList.size()){
+                position = 0;
+                LogUtils.e("+++++++++++++"+position);
+                LogUtils.e("b播放模式"+playMadel);
+            }
+        }else if(playMadel == MyMusicPlayService.ALL){
+            position++;
+            if(position >= videoItemArrayList.size()){
+                position = 0;
+                LogUtils.e("+++++++++++++"+position);
+                LogUtils.e("b播放模式"+playMadel);
+            }
+        }else {
+            position++;
+        }
     }
 
     /**
      * 播放上一个
      */
     private void pre(){
+        //1.根据当前模式设置下一个位置
+        setPrePosition();
+        //2.根据当前的播放模式和下标位置去播放音频
+        playPreAudio();
+    }
 
+    private void playPreAudio() {
+        int playMadel = getPlayMaodel();
+        if (playMadel == MyMusicPlayService.NORMAL){
+            if (position >= 0){
+                openAudio(position);
+            }else {
+                position = 0;
+                Toast.makeText(MyMusicPlayService.this,"第一首",Toast.LENGTH_SHORT).show();
+            }
+        }else if(playMadel == MyMusicPlayService.SINGLE){
+            openAudio(position);
+        }else if(playMadel == MyMusicPlayService.ALL){
+            openAudio(position);
+        }else {
+            if (position >= 0){
+                openAudio(position);
+            }else {
+                position = 0;
+            }
+        }
+
+    }
+
+    private void setPrePosition() {
+        int playMadel = getPlayMaodel();
+        if (playMadel == MyMusicPlayService.NORMAL){
+            position--;
+        }else if(playMadel == MyMusicPlayService.SINGLE){
+            position--;
+            if(position < 0){
+                position = videoItemArrayList.size()-1;
+            }
+        }else if(playMadel == MyMusicPlayService.ALL){
+            position--;
+            if(position < 0 ){
+                position = videoItemArrayList.size()-1;;
+            }
+        }else {
+            position--;
+        }
     }
 
     /**
@@ -282,7 +392,13 @@ public class MyMusicPlayService extends Service {
      * @param platModel
      */
     private void setPlayMaodel(int platModel){
-
+        this.playMode = platModel;
+        //CacheUtils.putPlayMode(this,"playmode",playMode);
+        if (playMode == MyMusicPlayService.SINGLE){
+            mediaPlayer.setLooping(true);
+        }else {
+            mediaPlayer.setLooping(false);
+        }
     }
 
     /**
@@ -290,7 +406,7 @@ public class MyMusicPlayService extends Service {
      * @return
      */
     private int getPlayMaodel(){
-        return 0;
+        return playMode;
     }
 
     private boolean isPlay(){
