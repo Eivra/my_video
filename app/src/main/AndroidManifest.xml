@@ -25,6 +25,8 @@
             android:configChanges="keyboardHidden|screenSize|orientation"/>
 
         <activity android:name=".activity.AuideoPlayerWindownActivity" android:launchMode="singleTask"/>
+        <activity android:name=".activity.WelcomeGuideActivity" android:launchMode="singleTask"/>
+        <activity android:name=".activity.SplashActivity" android:launchMode="singleTask"/>
 
         <service android:name=".service.MyMusicPlayService">
             <intent-filter>

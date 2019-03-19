@@ -1,32 +1,48 @@
 package com.example.my_video.activity;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 
 import com.example.my_video.R;
+import com.example.my_video.global.AppConstants;
+import com.example.my_video.utils.SpUtils;
 
 public class PlayActivity extends AppCompatActivity {
 private static final String TAG=PlayActivity.class.getSimpleName();//自动识别Acyivity
-private  Handler handler=new Handler();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.play_main);
-        //设置两秒进入主页面
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                //两秒后才执行到达要跳转的页面
-                //执行在主线程
-                startMainActivity();
-                Log.e(TAG,"当前线程==="+Thread.currentThread().getName());
-            }
-        },2000);
+        boolean isFirstOpen = SpUtils.getBoolean(this, AppConstants.FIRST_OPEN);
+        // 如果是第一次启动，则先进入功能引导页
+        if (!isFirstOpen) {
+            Intent intent = new Intent(this, WelcomeGuideActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+            // 如果不是第一次启动app，则正常显示启动屏
+            setContentView(R.layout.play_main);
+            //设置两秒进入主页面
+            new Handler().postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+                    enterHomeActivity();
+                }
+            }, 2000);
+        }
+
+
+    private void enterHomeActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+        Log.e(TAG,"当前线程==="+Thread.currentThread().getName());
     }
 
     /**
@@ -51,10 +67,11 @@ private  Handler handler=new Handler();
         return super.onTouchEvent(event);
     }
 
+
     @Override
     protected void onDestroy() {
         //消息和回调移除
-        handler.removeCallbacksAndMessages(null);
+        new Handler().removeCallbacksAndMessages(null);
         super.onDestroy();
     }
 }
