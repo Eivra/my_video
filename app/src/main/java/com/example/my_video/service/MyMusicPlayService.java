@@ -12,7 +12,6 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.widget.Toast;
 
 import com.example.my_video.IMyMusicPlayService;
@@ -274,7 +273,7 @@ public class MyMusicPlayService extends Service {
      * @return
      */
     private String getAudioPath(){
-        return "";
+        return videoItem.getData();
     }
 
     /**

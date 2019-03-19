@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <RelativeLayout
-
+        android:id="@+id/rl_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -31,6 +31,7 @@
     </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/aa_bottom"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="20dp"
         android:orientation="vertical"
@@ -100,5 +101,12 @@
                 android:layout_height="40dp" />
         </LinearLayout>
     </LinearLayout>
+
+    <com.example.my_video.view.ShowLyricView
+        android:layout_below="@+id/rl_top"
+        android:layout_above="@+id/aa_bottom"
+        android:id="@+id/showLyricView"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"/>
 
 </RelativeLayout>

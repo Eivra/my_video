@@ -1,16 +1,14 @@
 package com.example.my_video.activity;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.KeyEvent;
 import android.widget.FrameLayout;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.example.my_video.R;
 import com.example.my_video.basePage.BasePage;
@@ -94,4 +92,27 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
+    private Boolean ifExit = false;
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (KeyEvent.KEYCODE_BACK == keyCode){
+            if (position != 0){
+                position = 0;
+                rg_buttom.check(R.id.rb_video);
+                Toast.makeText(MainActivity.this,"返回到首页",Toast.LENGTH_SHORT).show();
+                return true;
+            }else if (!ifExit){
+                ifExit = true;
+                Toast.makeText(MainActivity.this,"再按一次退出",Toast.LENGTH_SHORT).show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        ifExit = false;
+                    }
+                },2000);
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 }

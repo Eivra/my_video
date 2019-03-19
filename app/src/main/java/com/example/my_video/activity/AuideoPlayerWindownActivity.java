@@ -7,13 +7,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -24,10 +23,15 @@ import com.example.my_video.IMyMusicPlayService;
 import com.example.my_video.R;
 import com.example.my_video.service.MyMusicPlayService;
 import com.example.my_video.utils.LogUtils;
+import com.example.my_video.utils.LyricUtil;
 import com.example.my_video.utils.TimeUtils;
+import com.example.my_video.view.ShowLyricView;
+
+import java.io.File;
 
 public class AuideoPlayerWindownActivity extends Activity implements View.OnClickListener{
     private static final int PROGRESS = 1;
+    private static final int SHOW_LYRIC = 2;
     private int position;
     private IMyMusicPlayService iMyMusicPlayService;
     private MyReceiver myReceiver;
@@ -43,6 +47,7 @@ public class AuideoPlayerWindownActivity extends Activity implements View.OnClic
     private Button butAudioStop;
     private Button butAudioNext;
     private Button butAudioLyric;
+    private ShowLyricView showLyricView;
     private ServiceConnection conn = new ServiceConnection() {
         /**
          * 连接成功回调的方法
@@ -103,6 +108,7 @@ public class AuideoPlayerWindownActivity extends Activity implements View.OnClic
         butAudioStop = (Button)findViewById( R.id.but_audio_stop );
         butAudioNext = (Button)findViewById( R.id.but_audio_next );
         butAudioLyric = (Button)findViewById( R.id.but_audio_lyric );
+        showLyricView = (ShowLyricView) findViewById(R.id.showLyricView);
 
         butAudioBack.setOnClickListener(this);
         butAudioLast.setOnClickListener(this);
@@ -250,6 +256,20 @@ public class AuideoPlayerWindownActivity extends Activity implements View.OnClic
             timeUtils = new TimeUtils();
             super.handleMessage(msg);
             switch (msg.what){
+                case SHOW_LYRIC:
+                    try {
+                        //1.得到当前的进度
+                        int currentPosition = iMyMusicPlayService.getCurrPosition();
+                        //2.把进度传入showLyricView，并计算该高亮那句
+                        showLyricView.setNetLyric(currentPosition);
+                        //3.实时发送消息
+                        handler.removeMessages(SHOW_LYRIC);
+                        handler.sendEmptyMessage(SHOW_LYRIC);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+
                 case PROGRESS:
                     try {
                         int currentPosition = iMyMusicPlayService.getCurrPosition();
@@ -279,12 +299,18 @@ public class AuideoPlayerWindownActivity extends Activity implements View.OnClic
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(MyMusicPlayService.Audio);
         registerReceiver(myReceiver,intentFilter);
+
+
     }
 
     class MyReceiver extends BroadcastReceiver{
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            /**
+             * 发消息开始歌词同步
+             */
+            showLyric();
             showAudioData();
             try {
                 checkModelPlay();
@@ -292,6 +318,31 @@ public class AuideoPlayerWindownActivity extends Activity implements View.OnClic
                 e.printStackTrace();
             }
         }
+    }
+    private void showLyric(){
+        //解析歌词
+        LyricUtil lyricUtil = new LyricUtil();
+        try {
+            //String path = iMyMusicPlayService.getAudioPath();
+            String path = Environment.getExternalStorageDirectory().getPath()+"/tencent/MicroMsg/Download/fsj.txt";
+            path = path.substring(0,path.indexOf("."));
+            File file = new File(path + ".lrc");
+            if (!file.exists()){
+                file = new File(path + ".txt");
+            }
+
+            lyricUtil.readLyricFile(file);
+            showLyricView.setLyrics(lyricUtil.getLyrics());
+            LogUtils.e("++++++歌词"+lyricUtil.getLyrics());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //传歌词文件
+
+        if (lyricUtil.isExistsLyric()){
+            handler.sendEmptyMessage(SHOW_LYRIC);
+        }
+
     }
 
     private void showAudioData() {
