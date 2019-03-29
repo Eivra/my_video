@@ -319,6 +319,10 @@ public class AuideoPlayerWindownActivity extends Activity implements View.OnClic
             }
         }
     }
+
+    /**
+     * 读取歌词文件
+     */
     private void showLyric(){
         //解析歌词
         LyricUtil lyricUtil = new LyricUtil();
@@ -341,6 +345,7 @@ public class AuideoPlayerWindownActivity extends Activity implements View.OnClic
 
         if (lyricUtil.isExistsLyric()){
             handler.sendEmptyMessage(SHOW_LYRIC);
+            lyrics.setText("没有歌词。。。");
         }
 
     }

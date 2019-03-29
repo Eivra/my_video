@@ -1,5 +1,7 @@
 package com.example.my_video.dto;
 
+import android.graphics.Bitmap;
+
 import java.io.Serializable;
 
 public class VideoItem implements Serializable {//还有一种序列化方法是Parecelable
@@ -8,6 +10,15 @@ public class VideoItem implements Serializable {//还有一种序列化方法是
     private long size;//视频文件大小
     private String data;///视频地址
     private String artist;//歌者名字
+    private Bitmap bitmap;//缩略图
+
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
 
     public String getName() {
         return name;

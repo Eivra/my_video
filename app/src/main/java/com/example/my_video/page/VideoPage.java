@@ -1,28 +1,19 @@
 package com.example.my_video.page;
 
-import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.text.format.Formatter;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.example.my_video.R;
 import com.example.my_video.activity.VideoPlayerWindownActivity;
@@ -32,8 +23,6 @@ import com.example.my_video.dto.VideoItem;
 import com.example.my_video.utils.LogUtils;
 import com.example.my_video.utils.TimeUtils;
 
-import java.io.File;
-import java.time.Instant;
 import java.util.ArrayList;
 
 
@@ -155,6 +144,7 @@ public class VideoPage extends BasePage {
 
                         String artist = cursor.getString(4);
                         videoItem.setArtist(artist);
+
 
                         videoItemArrayList.add(videoItem);
                     }

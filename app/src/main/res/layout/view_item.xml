@@ -6,7 +6,6 @@
     android:layout_height="70dp">
     <ImageView
         android:id="@+id/iv_image"
-        android:src="@drawable/video"
         android:layout_width="100dp"
         android:layout_height="100dp" />
     

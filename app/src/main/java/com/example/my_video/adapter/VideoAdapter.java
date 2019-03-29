@@ -1,6 +1,8 @@
 package com.example.my_video.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 import android.text.format.Formatter;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,13 +21,16 @@ public class VideoAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<VideoItem> videoItemArrayList;
     private TimeUtils timeUtils;
+    private  MediaMetadataRetriever media = new MediaMetadataRetriever();
+    private ImageView imageView;
+
     public  VideoAdapter(Context context,ArrayList<VideoItem> videoPageVideoItemArrayList,boolean isAudio){
         this.context=context;
         this.videoItemArrayList=videoPageVideoItemArrayList;
         this.isVideo = isAudio;
         timeUtils = new TimeUtils();
-
     }
+
     @Override
     public int getCount() {
         return videoItemArrayList.size();
@@ -56,8 +61,18 @@ public class VideoAdapter extends BaseAdapter {
         }else {
             viewHold = (ViewHold) convertView.getTag();
         }
+
         //根据position得到列表中的数据
         VideoItem videoItems = videoItemArrayList.get(position);
+
+        media.setDataSource(videoItems.getData());
+        /**
+         * 显示视频第一帧缩略图
+         */
+        Bitmap bitmap = media.getFrameAtTime();
+        imageView = convertView.findViewById(R.id.iv_image);
+        imageView.setImageBitmap(bitmap);
+
         viewHold.tv_videoName.setText(videoItems.getName());
         viewHold.tv_videoSize.setText(Formatter.formatFileSize(context,videoItems.getSize()));
         viewHold.tv_videoTime.setText(timeUtils.stringForTime((int)videoItems.getDuration()));
@@ -68,6 +83,7 @@ public class VideoAdapter extends BaseAdapter {
 
         return convertView;
     }
+
     static class ViewHold{
         ImageView iv_image;
         TextView tv_videoName;

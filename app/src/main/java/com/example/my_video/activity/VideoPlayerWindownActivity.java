@@ -2,6 +2,7 @@ package com.example.my_video.activity;
 
 import android.app.Activity;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -52,6 +53,7 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
     int position;//播放列表中的位置
     private AuideoPlayerWindownActivity.MyReceiver myReceiver;//监听电量广播
     private GestureDetector detector;//手势识别器
+    private MediaMetadataRetriever media = new MediaMetadataRetriever();
 
     private static final int PROGRESS = 1;
     private static final int HIDE_MEDIACONTROLLER =2;//控制面板
@@ -76,6 +78,7 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
     private Button butNext;
     private Button butScreen;
     private RelativeLayout mediaConctroller;
+    //private ImageView imageView;
 
     private Boolean isShowMediaConctroller=false;//是否显示控制面板
     private Boolean ifFullScreen = false;//是否全屏
@@ -118,6 +121,8 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         butScreen = (Button)findViewById( R.id.but_screen );
         video_player_windown = findViewById(R.id.video_player_windown);
         mediaConctroller=(RelativeLayout) findViewById(R.id.media_conctroller);
+        //imageView = (ImageView) findViewById(R.id.iv_image);
+
 
         butVoice.setOnClickListener(this);
         selectVideo.setOnClickListener( this );
@@ -337,11 +342,13 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         setListener();
         //获取播放地址
          getData();
-         setData();;
+         setData();
         //设置暂停.播放.控制条
        // video_player_windown.setMediaController(new MediaController(this));
 
     }
+
+
     private void setVideoType(int defaultScreen) {
         switch (defaultScreen){
             case FULL_SCREEN:
