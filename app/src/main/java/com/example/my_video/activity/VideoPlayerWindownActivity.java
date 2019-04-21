@@ -123,7 +123,6 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         mediaConctroller=(RelativeLayout) findViewById(R.id.media_conctroller);
         //imageView = (ImageView) findViewById(R.id.iv_image);
 
-
         butVoice.setOnClickListener(this);
         selectVideo.setOnClickListener( this );
         butBack.setOnClickListener( this );
@@ -395,8 +394,8 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
     }
     private void getData(){
         uri = getIntent().getData();
-        videoItemArrayList = (ArrayList<VideoItem>)getIntent().getSerializableExtra("videoList");
-        position = getIntent().getIntExtra("position",0);
+        videoItemArrayList = (ArrayList<VideoItem>)getIntent().getSerializableExtra("videoList");//获取的是VideoPage的 bundle.putSerializable("videoList",videoItemArrayList);//传递数据 key-value
+        position = getIntent().getIntExtra("position",0);//跟上面的一样
         video_player_windown.setVideoURI(uri);
         if (uri != null){
             video_player_windown.setVideoURI(uri);

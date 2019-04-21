@@ -46,9 +46,16 @@ public class VideoPage extends BasePage {
         listView = view.findViewById(R.id.listview);
         nonView = view.findViewById(R.id.nonView);
         pb_video = view.findViewById(R.id.pb_video);
-        listView.setOnItemClickListener(new OnContextClickListener());
+        listView.setOnItemClickListener(new OnContextClickListener());//点击事件，当点击某一条播放视频时触发的事件
         return view;
     }
+
+    /**
+     * 视频播放列表的点击事件
+     * 使用OnContextClickListener方法来为ListView注册了一个监听器，
+     * 当用户点击LisetView中任何一个子项时就会回调onItemClick，
+     * 这个方法可以通过position判断出用户点击的是哪一个子项，然后获取到想要视频
+     */
 
     class OnContextClickListener implements AdapterView.OnItemClickListener{
         @Override
@@ -71,9 +78,9 @@ public class VideoPage extends BasePage {
 //            intent.setDataAndType(uri, "video/*");
 //            context.startActivity(intent);
             //传递列表数据-对象-序列化
-            Intent intent = new Intent(context,VideoPlayerWindownActivity.class);
+            Intent intent = new Intent(context,VideoPlayerWindownActivity.class);//到播放界面
             Bundle bundle = new Bundle();
-            bundle.putSerializable("videoList",videoItemArrayList);
+            bundle.putSerializable("videoList",videoItemArrayList);//传递数据 key-value
             intent.putExtras(bundle);
             intent.putExtra("position",position);
             context.startActivity(intent);
@@ -145,8 +152,10 @@ public class VideoPage extends BasePage {
                         String artist = cursor.getString(4);
                         videoItem.setArtist(artist);
 
+                        if (videoItemArrayList!=null){
+                            videoItemArrayList.add(videoItem);
+                        }
 
-                        videoItemArrayList.add(videoItem);
                     }
                     cursor.close();
                 }

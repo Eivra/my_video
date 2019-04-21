@@ -48,7 +48,7 @@ public class VideoAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHold viewHold;
+        ViewHold viewHold;//对控件的实例进行缓存
         if (convertView == null){
             convertView = View.inflate(context,R.layout.view_item,null);
             viewHold = new ViewHold();
@@ -57,7 +57,7 @@ public class VideoAdapter extends BaseAdapter {
             viewHold.tv_videoTime = convertView.findViewById(R.id.tv_videoTime);
             viewHold.tv_videoSize = convertView.findViewById(R.id.tv_videoSize);
 
-            convertView.setTag(viewHold);
+            convertView.setTag(viewHold);//将viewHold存储在view
         }else {
             viewHold = (ViewHold) convertView.getTag();
         }

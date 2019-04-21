@@ -102,10 +102,10 @@ public class AudioPage extends BasePage {
                 ContentResolver contentResolver = context.getContentResolver();
                 Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
                 String[] object = {
-                        MediaStore.Audio.Media.DISPLAY_NAME,//视频在sd卡的名称
-                        MediaStore.Audio.Media.DURATION,//视频总时长
-                        MediaStore.Audio.Media.SIZE,//视频文件大小
-                        MediaStore.Audio.Media.DATA,//视频地址（绝对地址）
+                        MediaStore.Audio.Media.DISPLAY_NAME,//音频在sd卡的名称
+                        MediaStore.Audio.Media.DURATION,//音频总时长
+                        MediaStore.Audio.Media.SIZE,//音频文件大小
+                        MediaStore.Audio.Media.DATA,//音频地址（绝对地址）
                         MediaStore.Audio.Media.ARTIST,//歌者名字
                 };
                 Cursor cursor = contentResolver.query(uri, object, null, null, null);
@@ -132,7 +132,7 @@ public class AudioPage extends BasePage {
                     }
                     cursor.close();
                 }
-                //Handle send massage 不管有没有获取到视频资源都要发送消息
+                //Handle send massage 不管有没有获取到音频资源都要发送消息
                 handler.sendEmptyMessage(10);
             }
         }.start();

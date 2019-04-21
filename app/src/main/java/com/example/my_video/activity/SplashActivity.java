@@ -7,18 +7,18 @@ import android.os.Handler;
 
 import com.example.my_video.R;
 import com.example.my_video.global.AppConstants;
-import com.example.my_video.utils.LogUtils;
 import com.example.my_video.utils.SpUtils;
+import com.facebook.stetho.Stetho;
 
 public class SplashActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Stetho.initializeWithDefaults(this);
         // 判断是否是第一次开启应用
         boolean isFirstOpen = SpUtils.getBoolean(this, AppConstants.FIRST_OPEN);
-        LogUtils.e("显示this内容"+this);
         // 如果是第一次启动，则先进入功能引导页
-        if (!isFirstOpen) {
+        if (!isFirstOpen) {//非ture
             Intent intent = new Intent(this, WelcomeGuideActivity.class);
             startActivity(intent);
             finish();
