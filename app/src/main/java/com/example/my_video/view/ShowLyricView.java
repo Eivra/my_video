@@ -52,16 +52,16 @@ public class ShowLyricView extends TextView {
         whitePaint.setAntiAlias(true);//锯齿
         whitePaint.setTextAlign(Paint.Align.CENTER);
 
-        lyrics = new ArrayList<>();
-        Lyric lyric = new Lyric();
-        for (int i = 0;i<1000;++i){
-            lyric.setTimePoint(1000*i);
-            lyric.setSeelpTime(2000+i);
-            lyric.setContent("dsvdsbdfzbdfhdfzbdfbf"+i);
-            //把歌词添加到集合中
-            lyrics.add(lyric);
-            lyric = new Lyric();
-        }
+//        lyrics = new ArrayList<>();
+//        Lyric lyric = new Lyric();
+//        for (int i = 0;i<1000;++i){
+//            lyric.setTimePoint(1000*i);
+//            lyric.setSeelpTime(2000+i);
+//           lyric.setContent(""+i);
+//            //把歌词添加到集合中
+//            lyrics.add(lyric);
+//            lyric = new Lyric();
+//        }
 
     }
 
@@ -120,7 +120,7 @@ public class ShowLyricView extends TextView {
                 canvas.drawText(nextContent, width / 2, tempY, whitePaint);
             }
         }else {
-            canvas.drawText("没有歌词",width/2,height/2,paint);//歌词在屏幕的位置
+            canvas.drawText("没找到歌词",width/2,height/2,paint);//歌词在屏幕的位置
         }
     }
 

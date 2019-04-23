@@ -41,10 +41,10 @@ public class LyricUtil{
 
     /**
      * 读取歌词文件
-     * @param file /mnt/scard/audio/beijingbeijing.txt
+     * @param
      */
     public void readLyricFile(File file){
-        if(file == null || !file.exists()){
+        if(file==null || !file.exists()){
             //歌词文件不存在
             lyrics = null;
             isExistsLyric = false;
@@ -179,13 +179,13 @@ public class LyricUtil{
             //装时间
             long[] times = new long[getCountTag(line)];
 
-            String strTime =line.substring(pos1+1,pos2) ;//02:04.12
+            String strTime =line.substring(pos1+1,pos2) ;//
             times[0] = strTime2LongTime(strTime);
 
             String content = line;
             int i = 1;
             while (pos1 ==0 && pos2 != -1){
-                content = content.substring(pos2 + 1); //[03:37.32][00:59.73]我在这里欢笑--->[00:59.73]我在这里欢笑-->我在这里欢笑
+                content = content.substring(pos2 + 1); //
                 pos1 = content.indexOf("[");//0/-1
                 pos2 = content.indexOf("]");//9//-1
 

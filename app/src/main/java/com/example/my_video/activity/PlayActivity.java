@@ -17,11 +17,14 @@ private static final String TAG=PlayActivity.class.getSimpleName();//自动识�
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /**
+         * 通过工具SpUtils判断该播放器是否初次启动
+         */
         boolean isFirstOpen = SpUtils.getBoolean(this, AppConstants.FIRST_OPEN);
         // 如果是第一次启动，则先进入功能引导页
-        if (!isFirstOpen) {
+        if (!isFirstOpen) {//为false时
             Intent intent = new Intent(this, WelcomeGuideActivity.class);
-            startActivity(intent);
+            startActivity(intent);//启动页面
             finish();
             return;
         }

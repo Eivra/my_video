@@ -21,7 +21,7 @@ public class SpUtils {
     public static String getString(Context context, String strKey,
                                    String strDefault) {
         SharedPreferences setPreferences = context.getSharedPreferences(
-                spFileName, Context.MODE_PRIVATE);
+                spFileName, Context.MODE_PRIVATE);//默认MODE_PRIVATE为0
         String result = setPreferences.getString(strKey, strDefault);
         return result;
     }
@@ -37,6 +37,11 @@ public class SpUtils {
     public static Boolean getBoolean(Context context, String strKey) {
         SharedPreferences setPreferences = context.getSharedPreferences(
                 spFileName, Context.MODE_PRIVATE);
+        /**
+         * key：要检索的首选项的名称
+         * value：如果此首选项不存在，则返回的值
+         * 要检索的首选项的名称。返回首选项值（如果存在）或defvalue
+         */
         Boolean result = setPreferences.getBoolean(strKey, false);
         return result;
     }

@@ -262,9 +262,9 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
 
     //设置监听
     private void setListener(){
-        video_player_windown.setOnPreparedListener(new MyOnPreparedListener());
-        video_player_windown.setOnErrorListener(new MyOnErrorListener());
-        video_player_windown.setOnCompletionListener(new MyOnCompletionListener());
+        video_player_windown.setOnPreparedListener(new MyOnPreparedListener());//这个监听事件发生之前所要做的事情
+        video_player_windown.setOnErrorListener(new MyOnErrorListener());//事件发生错误时触发的监听事件
+        video_player_windown.setOnCompletionListener(new MyOnCompletionListener());//完成时触发的监听事件
 
         //设置seekBar监听
         sbTime.setOnSeekBarChangeListener(new videoSeekBarChangeListener());
@@ -286,6 +286,9 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         }
     }
 
+    /**
+     * 进度条监听事件
+     */
     class voiceOnSeekBarListener implements SeekBar.OnSeekBarChangeListener{
 
         @Override
@@ -310,6 +313,10 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
             handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,5000);
         }
     }
+
+    /**
+     * 进度条监听器
+     */
     class videoSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
 
         @Override
@@ -414,7 +421,10 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
     public void inite(){
         timeUtils = new TimeUtils();
 
-        detector = new GestureDetector(this,new GestureDetector.SimpleOnGestureListener(){
+        /**
+         * 手势识别器
+         */
+        detector = new GestureDetector(this,new GestureDetector.SimpleOnGestureListener(){//看源码
             @Override
             public void onLongPress(MotionEvent e) {
                 playAndstop();
@@ -488,13 +498,16 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
        }
    };
 
+    /**
+     * 准备好的监听
+     */
     public class MyOnPreparedListener implements MediaPlayer.OnPreparedListener {
 
         @Override
         public void onPrepared(MediaPlayer mp) {
             videoWidth = mp.getVideoWidth();
             videoHeight = mp.getVideoHeight();
-            video_player_windown.start();
+            video_player_windown.start();//开始播放
             //获取视频总时间
             int duration = video_player_windown.getDuration();
             sbTime.setMax(duration);
@@ -511,6 +524,9 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         }
     }
 
+    /**
+     * 播放出错了的监听
+     */
     public class MyOnErrorListener implements MediaPlayer.OnErrorListener{
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
@@ -519,6 +535,9 @@ public class VideoPlayerWindownActivity extends Activity implements View.OnClick
         }
     }
 
+    /**
+     * 播放完成了的监听
+     */
     private class MyOnCompletionListener implements MediaPlayer.OnCompletionListener {
         @Override
         public void onCompletion(MediaPlayer mp) {

@@ -59,7 +59,7 @@ public class VideoPage extends BasePage {
 
     class OnContextClickListener implements AdapterView.OnItemClickListener{
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {//点击列表时触发的事件
            VideoItem videoItem = videoItemArrayList.get(position);
            //打印信息
             //Toast.makeText(context, videoItem.toString(),Toast.LENGTH_SHORT).show();
@@ -109,6 +109,7 @@ public class VideoPage extends BasePage {
                 //没数据
                 //显示文本
                 nonView.setVisibility(View.VISIBLE);
+                nonView.setText("没有发现音频。。。");
             }
             pb_video.setVisibility(View.GONE);
         }

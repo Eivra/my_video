@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.MediaStore;
@@ -332,6 +333,9 @@ public class MyMusicPlayService extends Service {
         }else {
             position++;
         }
+
+        Bundle bundle = new Bundle();
+        bundle.putInt("p",position);
     }
 
     /**

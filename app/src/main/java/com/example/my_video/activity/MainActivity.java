@@ -46,7 +46,7 @@ public class MainActivity extends FragmentActivity {
         basePages.add(new NetAudioPage(this));//网络音频-3
         basePages.add(new NetVideoPage(this));//网络视频-4
 
-        //设置RadioGroup监听
+        //设置RadioGroup监听，每个按钮显示不同页面和加载不同数据
         rg_buttom.setOnCheckedChangeListener(new MyOnCheckedChangeListener());
         rg_buttom.check(R.id.rb_video);//默认选中首页的第一个
     }
@@ -77,14 +77,14 @@ public class MainActivity extends FragmentActivity {
             //2.开启事物
             FragmentTransaction ft=manager.beginTransaction();
             //3.替换
-           ft.replace(R.id.fl_main_conten, new ReplaceFragment(getBasePage()));
+           ft.replace(R.id.fl_main_conten, new ReplaceFragment(getBasePage()));//替换为自己想要的页面
             //4.提交事物
             ft.commit();
         }
         private BasePage getBasePage() {
             BasePage basePage=basePages.get(position);
             if (basePage!=null && !basePage.isinitDate){
-                basePage.initDate();
+                basePage.initDate();//加载video_page
                 //使界面不重复初始化
                 basePage.isinitDate = true;
             }

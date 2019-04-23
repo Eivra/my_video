@@ -3,10 +3,14 @@ package com.example.my_video.basePage;
 import android.content.Context;
 import android.view.View;
 
-import java.util.logging.Logger;
-
 public abstract class BasePage {
+    /**
+     * 上下文
+     */
     public final Context context;
+    /**
+     * 接收各页面的实例
+     */
     public View rootView;
     public boolean isinitDate;
 
@@ -14,6 +18,11 @@ public abstract class BasePage {
         this.context=context;
         rootView=initView();
     }
+
+    /**
+     * 强制子页面实现该方法，实现想要的特定效果
+     * @return
+     */
     public abstract View initView();
 
     /**

@@ -177,10 +177,10 @@ public class AuideoPlayerWindownActivity extends Activity implements View.OnClic
                         //暂停
                         iMyMusicPlayService.pause();
                         //暂停按钮
-                        butAudioStop.setBackgroundResource(R.drawable.stop_press);
+                        butAudioStop.setBackgroundResource(R.drawable.audio_stop_press);
                     }else {
                         iMyMusicPlayService.start();
-                        butAudioStop.setBackgroundResource(R.drawable.stop);
+                        butAudioStop.setBackgroundResource(R.drawable.audio_stop);
                     }
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -310,7 +310,11 @@ public class AuideoPlayerWindownActivity extends Activity implements View.OnClic
             /**
              * 发消息开始歌词同步
              */
-            showLyric();
+            try {
+                showLyric(iMyMusicPlayService.getSingerName());
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             showAudioData();
             try {
                 checkModelPlay();
@@ -323,26 +327,26 @@ public class AuideoPlayerWindownActivity extends Activity implements View.OnClic
     /**
      * 读取歌词文件
      */
-    private void showLyric(){
+    private void showLyric(String name){
         //解析歌词
         LyricUtil lyricUtil = new LyricUtil();
         try {
-            //String path = iMyMusicPlayService.getAudioPath();
-            String path = Environment.getExternalStorageDirectory().getPath()+"/tencent/MicroMsg/Download/fsj.txt";
-            path = path.substring(0,path.indexOf("."));
-            File file = new File(path + ".lrc");
+           name = name.substring(name.indexOf("-")+2,name.indexOf("."));
+
+            String path = Environment.getExternalStorageDirectory().getPath()+"/tencent/MicroMsg/Download/"+name+".txt";
+           // path = path.substring(0,path.indexOf("."));
+            File file = new File(path);
             if (!file.exists()){
                 file = new File(path + ".txt");
             }
-
             lyricUtil.readLyricFile(file);
             showLyricView.setLyrics(lyricUtil.getLyrics());
             LogUtils.e("++++++歌词"+lyricUtil.getLyrics());
+
         } catch (Exception e) {
             e.printStackTrace();
         }
         //传歌词文件
-
         if (lyricUtil.isExistsLyric()){
             handler.sendEmptyMessage(SHOW_LYRIC);
             lyrics.setText("没有歌词。。。");

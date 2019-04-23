@@ -30,6 +30,9 @@ public class AudioPage extends BasePage {
     private TextView nonView;
     private ProgressBar pb_video;
     private VideoItem videoItem;
+    /**
+     * 装数据集合
+     */
     private ArrayList<VideoItem> videoItemArrayList;
     private TimeUtils timeUtils;
     private VideoAdapter videoAdapter;
@@ -41,7 +44,7 @@ public class AudioPage extends BasePage {
 
     @Override
     public View initView() {
-        View view = View.inflate(context, R.layout.video_pager, null);
+        View view = View.inflate(context, R.layout.video_pager, null);//存放视频或音频列表的布局界面
         listView = view.findViewById(R.id.listview);
         nonView = view.findViewById(R.id.nonView);
         pb_video = view.findViewById(R.id.pb_video);
@@ -77,7 +80,7 @@ public class AudioPage extends BasePage {
             if (videoItemArrayList != null && videoItemArrayList.size() > 0) {
                 //有数据
                 //设置适配器
-                videoAdapter = new VideoAdapter(context, videoItemArrayList,false);
+                videoAdapter = new VideoAdapter(context, videoItemArrayList,false);//isAudio判断当前是对音频的加载还是视频，因为图片不一样
                 listView.setAdapter(videoAdapter);
                 //隐藏文本
                 nonView.setVisibility(View.GONE);
@@ -85,6 +88,7 @@ public class AudioPage extends BasePage {
                 //没数据
                 //显示文本
                 nonView.setVisibility(View.VISIBLE);
+                nonView.setText("没有发现音频。。。。");
             }
             pb_video.setVisibility(View.GONE);
         }
